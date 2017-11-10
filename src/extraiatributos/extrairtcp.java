@@ -33,12 +33,15 @@ public class extrairtcp {
 		Files.write(file, fluxo, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
 	}
 	public static void extraindo(JpcapCaptor pcaptor) throws IOException {    	
-
-		int janela = 0;
-		int payload = 0;  
-		int comp_cabecalhotcp = 0;
-		int comp_pacote = 0;
-
+                
+            
+                int comp_pacoteip = 0;
+                int comp_cabecalhotcp = 0;
+		int janelatcp = 0;
+		int payloadtcp = 0;  
+	
+		
+                
 		List<String> fluxos = new ArrayList<>();
 
 		//lista para receber os pacotes
@@ -55,22 +58,26 @@ public class extrairtcp {
 		//percorrendo a lista de pacotes para calcular os atributos
 		int contador = 0;
 		for (Packet packet : pacotes) {
-
+                    if (packet instanceof IPPacket) {
+                        IPPacket pacoteip = (IPPacket) packet;
+                        
+                        //obtem o comprimento do cabeçalho do pacote ip
+			comp_pacoteip = comp_pacoteip + pacoteip.len;                        
+                        
+                    }
 			if (packet instanceof TCPPacket) {
-				TCPPacket tcp = (TCPPacket) packet;
+				TCPPacket tcp = (TCPPacket) packet;                                                            
+                                
 
-				//obtem o Tamanho da janela
-				janela = janela + tcp.window;
-
-				//obtem o tamanho do payload
-				payload = payload + tcp.data.length;
-
-				//obtem o comprimento do cabe�alho TCP 
-				comp_cabecalhotcp = comp_cabecalhotcp + tcp.header.length;
-
-				//obtem o comprimento do pacote
-				comp_pacote = comp_pacote + tcp.length;
-
+				//obtem o comprimento do cabecalho TCP 
+				comp_cabecalhotcp = comp_cabecalhotcp + tcp.header.length;	
+                                
+                                //obtem o Tamanho da janela
+				janelatcp = janelatcp + tcp.window;
+                             
+                                //obtem o tamanho do payload
+				payloadtcp = payloadtcp + tcp.data.length;
+                                
 
 				contador++;
 			}
@@ -78,8 +85,11 @@ public class extrairtcp {
 
 		}
 
-
-		fluxos.add(+janela+ "," +payload+ "," +comp_cabecalhotcp+ "," +comp_pacote+ ",p2p");
+	
+		fluxos.add(+comp_pacoteip+ "," +comp_cabecalhotcp+ "," +janelatcp+ "," +payloadtcp+ ",p2p");
 		escreveArquivo(fluxos);
+                //System.out.println(comp_pacoteip+ "," +comp_cabecalhotcp+ "," +janelatcp+ "," +payloadtcp+ ",p2p");
+
 	}
+    
 }
