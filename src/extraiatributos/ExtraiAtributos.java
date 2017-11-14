@@ -1,12 +1,8 @@
 package extraiatributos;
 
 
-import static extraiatributos.ExtraiAtributos.CLASSE;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -26,9 +22,10 @@ public class ExtraiAtributos {
     public static void main(String[] args) throws IOException {
     	
     	for (int i = 1; i <= 20; i++) {
+    		System.out.println("Iteração "+i);
             try {
                 fluxoAlvo = JpcapCaptor.openFile(url_fluxos_rotulados + "\\Fluxo (" + i + ").pcap");
-                extraiatributos.extrairtcp.extraindo(fluxoAlvo);
+                extraiatributos.extrairtcp2.extraindo(fluxoAlvo);
             } catch (IOException ex) {
                 Logger.getLogger(extrairtcp.class.getName()).log(Level.SEVERE, null, ex);
             } finally {
