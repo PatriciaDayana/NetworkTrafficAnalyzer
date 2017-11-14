@@ -7,6 +7,7 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,7 +87,9 @@ public class extrairtcp2 {
             }
 
         }
-
+        
+        DecimalFormat dec = new DecimalFormat("###,###,##0.000000"); //ajuste de casas decimais
+        
         //Pacote completo - média, desvio padrão, variância, valor máximo;
         double tam_medio_pacote = tam_pacote.getMean();
         double desvio_padrao_pacote = tam_pacote.getStandardDeviation();
@@ -107,8 +110,8 @@ public class extrairtcp2 {
         List<Comparable<?>> moda_dstportaudp = numero_dstportudp.getMode();
 
         //Número da porta - moda
-        System.out.println("Dados do tamanho do pacote");
-        System.out.println(tam_medio_pacote + ", " + desvio_padrao_pacote + ", " + variancia_pacote + ", " + maximo_pacote);
+        System.out.println("Dados do tamanho do pacote");//testando o DecimalFormat em tam_medio_pacote
+        System.out.println((dec.format(tam_medio_pacote))+ ", " + desvio_padrao_pacote + ", " + variancia_pacote + ", " + maximo_pacote);
 
         System.out.println("Dados do tamanho do cabeçalho");
         System.out.println(tam_medio_cabecalho + ", " + desvio_padrao_cabecalho + ", " + variancia_cabecalho);
@@ -132,4 +135,3 @@ public class extrairtcp2 {
         //System.out.println(packet.toString());
     }
 }
-
