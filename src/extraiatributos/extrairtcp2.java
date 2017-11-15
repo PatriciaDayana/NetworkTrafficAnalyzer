@@ -30,7 +30,7 @@ public class extrairtcp2 {
 
     public static void escreveArquivo(List<String> fluxo) throws IOException {
 
-        //Se o arquivo nÃ£o existe, cria.
+        //Se o arquivo nÃƒÂ£o existe, cria.
         if (!Files.exists(file, LinkOption.NOFOLLOW_LINKS)) {
             Files.createFile(file);
         }
@@ -49,7 +49,7 @@ public class extrairtcp2 {
         Frequency numero_dstportudp = new Frequency();
         */
         
-        //Modifica��o sugerida. N�o fazer distin��o da vari�vel de n�mero de porta por protocolo, TCP e UDP possuem porta.
+        //Modificação sugerida. Não fazer distinção da variável de número de porta por protocolo, TCP e UDP possuem porta.
         Frequency numero_srcport = new Frequency();
         Frequency numero_dstport = new Frequency();
 
@@ -67,7 +67,7 @@ public class extrairtcp2 {
         //percorrendo a lista de pacotes para calcular os atributos
         for (Packet packet : pacotes) {
 
-            //IPPacket, aqui ficam os atributos que são comum ao TCP e UDP
+            //IPPacket, aqui ficam os atributos que sÃ£o comum ao TCP e UDP
             if (packet instanceof IPPacket) {
 
                 IPPacket pacote = (IPPacket) packet;
@@ -85,7 +85,7 @@ public class extrairtcp2 {
                 //numero_srcporttcp.addValue(((TCPPacket) pacote_tcp).src_port);
                 //numero_dstporttcp.addValue(((TCPPacket) pacote_tcp).dst_port);
                 
-                //Modifica��o sugerida.
+                //Modificação sugerida.
                 numero_srcport.addValue(((TCPPacket) pacote_tcp).src_port);
                 numero_dstport.addValue(((TCPPacket) pacote_tcp).dst_port);
             }
@@ -94,25 +94,25 @@ public class extrairtcp2 {
                 //numero_srcportudp.addValue(((UDPPacket) pacote_udp).src_port);
                 //numero_dstportudp.addValue(((UDPPacket) pacote_udp).dst_port);
                 
-                //Modifica��o sugerida.
+                //Modificação sugerida.
                 numero_srcport.addValue(((UDPPacket) pacote_udp).src_port);
                 numero_dstport.addValue(((UDPPacket) pacote_udp).dst_port);
             }
 
         }
                 
-        //Pacote completo - média, desvio padrão, variância, valor máximo;
+        //Pacote completo - mÃ©dia, desvio padrÃ£o, variÃ¢ncia, valor mÃ¡ximo;
         double tam_medio_pacote = tam_pacote.getMean();
         double desvio_padrao_pacote = tam_pacote.getStandardDeviation();
         double variancia_pacote = tam_pacote.getVariance();
         double maximo_pacote = tam_pacote.getMax();
 
-        //Cabeçalho - média, desvio padrão e variância;
+        //CabeÃ§alho - mÃ©dia, desvio padrÃ£o e variÃ¢ncia;
         double tam_medio_cabecalho = tam_cabecalho.getMean();
         double desvio_padrao_cabecalho = tam_cabecalho.getStandardDeviation();
         double variancia_cabecalho = tam_cabecalho.getVariance();
 
-        //Número do protocolo - moda
+        //NÃºmero do protocolo - moda
         List<Comparable<?>> moda_protocolo = codigo_protocolo.getMode();
 
         //List<Comparable<?>> moda_srcportatcp = numero_srcporttcp.getMode();
@@ -120,11 +120,11 @@ public class extrairtcp2 {
         //List<Comparable<?>> moda_srcportaudp = numero_srcportudp.getMode();
         //List<Comparable<?>> moda_dstportaudp = numero_dstportudp.getMode();
         
-        //Modifica��o sugerida.
+        //Modificação sugerida.
         List<Comparable<?>> moda_srcporta = numero_srcport.getMode();
         List<Comparable<?>> moda_dstporta = numero_dstport.getMode();
 
-        //Número da porta - moda
+        //NÃºmero da porta - moda
         System.out.println("Dados do tamanho do pacote");
         //System.out.println(tam_medio_pacote+ ", " + desvio_padrao_pacote + ", " + variancia_pacote + ", " + maximo_pacote);
         BigDecimal tmp = new BigDecimal(tam_medio_pacote).setScale(5, RoundingMode.HALF_EVEN);
@@ -137,7 +137,7 @@ public class extrairtcp2 {
         System.out.println(mp.doubleValue());
     
 
-        System.out.println("Dados do tamanho do cabeçalho");
+        System.out.println("Dados do tamanho do cabeÃ§alho");
        // System.out.println(tam_medio_cabecalho + ", " + desvio_padrao_cabecalho + ", " + variancia_cabecalho);
         BigDecimal tmc = new BigDecimal(tam_medio_cabecalho).setScale(5, RoundingMode.HALF_EVEN);
         BigDecimal dpc = new BigDecimal(desvio_padrao_cabecalho).setScale(5, RoundingMode.HALF_EVEN);
@@ -178,7 +178,7 @@ public class extrairtcp2 {
         */
         
         fluxos.add(
-        		tmp + "," + dpp + "," + vp + "," + mp +
+        		tmp + "," + dpp + "," + vp + "," + mp + "," +
         		tmc + "," + dpc + "," + vc + ", " +
         		moda_protocolo.get(0) + "," + 
         		moda_dstporta.get(0) + "," + moda_srcporta.get(0) + 
