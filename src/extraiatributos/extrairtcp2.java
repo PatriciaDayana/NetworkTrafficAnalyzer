@@ -181,7 +181,7 @@ public class extrairtcp2 {
         		tmp + "," + dpp + "," + vp + "," + mp + "," +
         		tmc + "," + dpc + "," + vc + ", " +
         		moda_protocolo.get(0) + "," + 
-        		moda_dstporta.get(0) + "," + moda_srcporta.get(0) + 
+        		moda_srcporta.get(0) + "," + moda_dstporta.get(0) +
         		",ftp"
         		);
         escreveArquivo(fluxos);			
