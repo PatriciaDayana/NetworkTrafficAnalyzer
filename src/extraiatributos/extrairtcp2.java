@@ -1,13 +1,14 @@
 package extraiatributos;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,9 +86,7 @@ public class extrairtcp2 {
             }
 
         }
-        
-        DecimalFormat dec = new DecimalFormat("###,###,##0.000000"); //ajuste de casas decimais
-        
+                
         //Pacote completo - média, desvio padrão, variância, valor máximo;
         double tam_medio_pacote = tam_pacote.getMean();
         double desvio_padrao_pacote = tam_pacote.getStandardDeviation();
@@ -108,11 +107,27 @@ public class extrairtcp2 {
         List<Comparable<?>> moda_dstportaudp = numero_dstportudp.getMode();
 
         //Número da porta - moda
-        System.out.println("Dados do tamanho do pacote");//testando o DecimalFormat em tam_medio_pacote
-        System.out.println((dec.format(tam_medio_pacote))+ ", " + desvio_padrao_pacote + ", " + variancia_pacote + ", " + maximo_pacote);
+        System.out.println("Dados do tamanho do pacote");
+        //System.out.println(tam_medio_pacote+ ", " + desvio_padrao_pacote + ", " + variancia_pacote + ", " + maximo_pacote);
+        BigDecimal tmp = new BigDecimal(tam_medio_pacote).setScale(5, RoundingMode.HALF_EVEN);
+        BigDecimal dpp = new BigDecimal(desvio_padrao_pacote).setScale(5, RoundingMode.HALF_EVEN);
+        BigDecimal vp = new BigDecimal(variancia_pacote).setScale(5, RoundingMode.HALF_EVEN);
+        BigDecimal mp = new BigDecimal(maximo_pacote).setScale(5, RoundingMode.HALF_EVEN);
+        System.out.println(tmp.doubleValue());
+        System.out.println(dpp.doubleValue());
+        System.out.println(vp.doubleValue());
+        System.out.println(mp.doubleValue());
+    
 
         System.out.println("Dados do tamanho do cabeçalho");
-        System.out.println(tam_medio_cabecalho + ", " + desvio_padrao_cabecalho + ", " + variancia_cabecalho);
+       // System.out.println(tam_medio_cabecalho + ", " + desvio_padrao_cabecalho + ", " + variancia_cabecalho);
+        BigDecimal tmc = new BigDecimal(tam_medio_cabecalho).setScale(5, RoundingMode.HALF_EVEN);
+        BigDecimal dpc = new BigDecimal(desvio_padrao_cabecalho).setScale(5, RoundingMode.HALF_EVEN);
+        BigDecimal vc = new BigDecimal(variancia_cabecalho).setScale(5, RoundingMode.HALF_EVEN);
+        System.out.println(tmc.doubleValue());
+        System.out.println(dpc.doubleValue());
+        System.out.println(vc.doubleValue());
+        
 
         System.out.println("Moda do protocolo");
         System.out.println(moda_protocolo);
