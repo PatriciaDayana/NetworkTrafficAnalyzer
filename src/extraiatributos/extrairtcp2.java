@@ -42,10 +42,16 @@ public class extrairtcp2 {
         SummaryStatistics tam_pacote = new SummaryStatistics();
         SummaryStatistics tam_cabecalho = new SummaryStatistics();
         Frequency codigo_protocolo = new Frequency();
+        /*
         Frequency numero_srcporttcp = new Frequency();
         Frequency numero_dstporttcp = new Frequency();
         Frequency numero_srcportudp = new Frequency();
         Frequency numero_dstportudp = new Frequency();
+        */
+        
+        //Modificação sugerida. Não fazer distinção da variável de número de porta por protocolo, TCP e UDP possuem porta.
+        Frequency numero_srcport = new Frequency();
+        Frequency numero_dstport = new Frequency();
 
         //lista para receber os pacotes
         final List<Packet> pacotes = new ArrayList<>();
@@ -76,13 +82,21 @@ public class extrairtcp2 {
 
             if (packet instanceof TCPPacket) {
                 TCPPacket pacote_tcp = (TCPPacket) packet;
-                numero_srcporttcp.addValue(((TCPPacket) pacote_tcp).src_port);
-                numero_dstporttcp.addValue(((TCPPacket) pacote_tcp).dst_port);
+                //numero_srcporttcp.addValue(((TCPPacket) pacote_tcp).src_port);
+                //numero_dstporttcp.addValue(((TCPPacket) pacote_tcp).dst_port);
+                
+                //Modificação sugerida.
+                numero_srcport.addValue(((TCPPacket) pacote_tcp).src_port);
+                numero_dstport.addValue(((TCPPacket) pacote_tcp).dst_port);
             }
             if (packet instanceof UDPPacket) {
                 UDPPacket pacote_udp = (UDPPacket) packet;
-                numero_srcportudp.addValue(((UDPPacket) pacote_udp).src_port);
-                numero_dstportudp.addValue(((UDPPacket) pacote_udp).dst_port);
+                //numero_srcportudp.addValue(((UDPPacket) pacote_udp).src_port);
+                //numero_dstportudp.addValue(((UDPPacket) pacote_udp).dst_port);
+                
+                //Modificação sugerida.
+                numero_srcport.addValue(((UDPPacket) pacote_udp).src_port);
+                numero_dstport.addValue(((UDPPacket) pacote_udp).dst_port);
             }
 
         }
@@ -101,10 +115,14 @@ public class extrairtcp2 {
         //NÃºmero do protocolo - moda
         List<Comparable<?>> moda_protocolo = codigo_protocolo.getMode();
 
-        List<Comparable<?>> moda_srcportatcp = numero_srcporttcp.getMode();
-        List<Comparable<?>> moda_dstportatcp = numero_dstporttcp.getMode();
-        List<Comparable<?>> moda_srcportaudp = numero_srcportudp.getMode();
-        List<Comparable<?>> moda_dstportaudp = numero_dstportudp.getMode();
+        //List<Comparable<?>> moda_srcportatcp = numero_srcporttcp.getMode();
+        //List<Comparable<?>> moda_dstportatcp = numero_dstporttcp.getMode();
+        //List<Comparable<?>> moda_srcportaudp = numero_srcportudp.getMode();
+        //List<Comparable<?>> moda_dstportaudp = numero_dstportudp.getMode();
+        
+        //Modificação sugerida.
+        List<Comparable<?>> moda_srcporta = numero_srcport.getMode();
+        List<Comparable<?>> moda_dstporta = numero_dstport.getMode();
 
         //NÃºmero da porta - moda
         System.out.println("Dados do tamanho do pacote");
@@ -131,7 +149,8 @@ public class extrairtcp2 {
 
         System.out.println("Moda do protocolo");
         System.out.println(moda_protocolo);
-
+        
+        /*
         System.out.println("Moda porta src tcp");
         System.out.println(moda_srcportatcp);
         System.out.println("Moda porta dst tcp");
@@ -141,14 +160,30 @@ public class extrairtcp2 {
         System.out.println(moda_srcportaudp);
         System.out.println("Moda porta dst udp");
         System.out.println(moda_dstportaudp);
+        */
+        
+        System.out.println("Moda porta src");
+        System.out.println(moda_srcporta);
+        System.out.println("Moda porta dst");
+        System.out.println(moda_dstporta);
+        
         System.out.println("---------------------------------------------------------");
         
         List<String> fluxos = new ArrayList<>();
-        fluxos.add(tam_medio_pacote + "," + desvio_padrao_pacote + "," + variancia_pacote + "," + maximo_pacote +
-        		tam_medio_cabecalho + "," + desvio_padrao_cabecalho + "," + variancia_cabecalho + ", " +
+        /*fluxos.add(tmp + "," + dpp + "," + vp + "," + mp +
+        		tmc + "," + dpc + "," + vc + ", " +
         		moda_protocolo.get(0) + "," + 
-        		moda_dstportatcp + "," + moda_srcportatcp + "," + 
-        		moda_dstportaudp + "," + moda_srcportaudp +",ftp");
+        		moda_dstportatcp.get(0) + "," + moda_srcportatcp.get(0) + "," + 
+        		moda_dstportaudp.get(0) + "," + moda_srcportaudp.get(0) +",ftp");
+        */
+        
+        fluxos.add(
+        		tmp + "," + dpp + "," + vp + "," + mp +
+        		tmc + "," + dpc + "," + vc + ", " +
+        		moda_protocolo.get(0) + "," + 
+        		moda_dstporta.get(0) + "," + moda_srcporta.get(0) + 
+        		",ftp"
+        		);
         escreveArquivo(fluxos);			
         //System.out.println(packet.toString());
     }
