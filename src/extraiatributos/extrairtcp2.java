@@ -26,7 +26,7 @@ import jpcap.packet.UDPPacket;
 public class extrairtcp2 {
 
     static NetworkInterface[] array;
-    static Path file = Paths.get("weka_input_web.arff");
+    static Path file = Paths.get("weka_input_dns.arff");
 
     public static void escreveArquivo(List<String> fluxo) throws IOException {
 
@@ -148,14 +148,13 @@ public class extrairtcp2 {
         
 
         System.out.println("Moda do protocolo");
-        System.out.println(moda_protocolo);
+        System.out.println(moda_protocolo.get(0));
         
         /*
         System.out.println("Moda porta src tcp");
         System.out.println(moda_srcportatcp);
         System.out.println("Moda porta dst tcp");
         System.out.println(moda_dstportatcp);
-
         System.out.println("Moda porta src udp");
         System.out.println(moda_srcportaudp);
         System.out.println("Moda porta dst udp");
@@ -163,9 +162,9 @@ public class extrairtcp2 {
         */
         
         System.out.println("Moda porta src");
-        System.out.println(moda_srcporta);
+        System.out.println(moda_srcporta.get(0));
         System.out.println("Moda porta dst");
-        System.out.println(moda_dstporta);
+        System.out.println(moda_dstporta.get(0));
         
         System.out.println("---------------------------------------------------------");
         
@@ -179,10 +178,10 @@ public class extrairtcp2 {
         
         fluxos.add(
         		tmp + "," + dpp + "," + vp + "," + mp + "," +
-        		tmc + "," + dpc + "," + vc + ", " +
+        		tmc + "," + dpc + "," + vc + "," +
         		moda_protocolo.get(0) + "," + 
-        		moda_srcporta.get(0) + "," + moda_dstporta.get(0) +
-        		",ftp"
+        		moda_srcporta.get(0) + "," + moda_dstporta.get(0) + 
+        		",dns"
         		);
         escreveArquivo(fluxos);			
         //System.out.println(packet.toString());
