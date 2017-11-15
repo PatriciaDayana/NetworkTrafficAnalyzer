@@ -77,13 +77,11 @@ public class extrairtcp2 {
                 TCPPacket pacote_tcp = (TCPPacket) packet;
                 numero_srcporttcp.addValue(((TCPPacket) pacote_tcp).src_port);
                 numero_dstporttcp.addValue(((TCPPacket) pacote_tcp).dst_port);
-                //System.out.println(pacote_tcp.dst_port);
             }
             if (packet instanceof UDPPacket) {
                 UDPPacket pacote_udp = (UDPPacket) packet;
                 numero_srcportudp.addValue(((UDPPacket) pacote_udp).src_port);
                 numero_dstportudp.addValue(((UDPPacket) pacote_udp).dst_port);
-
             }
 
         }
@@ -129,9 +127,14 @@ public class extrairtcp2 {
         System.out.println("Moda porta dst udp");
         System.out.println(moda_dstportaudp);
         System.out.println("---------------------------------------------------------");
-
-        //fluxos.add(+tam_medio_pacote + "," + desvio_padrao_pacote + "," + variancia_pacote + "," + maximo_pacote + ",ftp");
-        //escreveArquivo(fluxos);			
+        
+        List<String> fluxos = new ArrayList<>();
+        fluxos.add(tam_medio_pacote + "," + desvio_padrao_pacote + "," + variancia_pacote + "," + maximo_pacote +
+        		tam_medio_cabecalho + "," + desvio_padrao_cabecalho + "," + variancia_cabecalho + ", " +
+        		moda_protocolo.get(0) + "," + 
+        		moda_dstportatcp + "," + moda_srcportatcp + "," + 
+        		moda_dstportaudp + "," + moda_srcportaudp +",ftp");
+        escreveArquivo(fluxos);			
         //System.out.println(packet.toString());
     }
 }

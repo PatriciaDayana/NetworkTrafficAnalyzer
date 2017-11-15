@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="C:/Users/Matheus/eclipse-workspace/ExtrairAtributos/lib/javadoc_net.sourceforge.jpcap-0.01.16.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Matheus/eclipse-workspace/ExtrairAtributos/lib/jpcap.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Matheus/eclipse-workspace/ExtrairAtributos/lib/net.sourceforge.jpcap-0.01.16.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Matheus/eclipse-workspace/ExtrairAtributos/lib/commons-math3-3.6.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
