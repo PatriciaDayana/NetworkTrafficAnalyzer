@@ -1,8 +1,9 @@
 package extraiatributos;
 
-
+import static extraiatributos.ExtraiAtributos2.CLASSE;
 import java.io.IOException;
-import java.lang.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -10,129 +11,144 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+
+import org.apache.commons.math3.stat.Frequency;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+
 import jpcap.JpcapCaptor;
 import jpcap.NetworkInterface;
 import jpcap.PacketReceiver;
 import jpcap.packet.IPPacket;
 import jpcap.packet.Packet;
 import jpcap.packet.TCPPacket;
+import jpcap.packet.UDPPacket;
 
-public class extrairtcp {
+public class Extrair_tcp_udp {
 
-	static NetworkInterface[] array;
-	static Path file = Paths.get("weka_input_web.arff");
+    static NetworkInterface[] array;
+    static Path file = Paths.get("weka_input_" + CLASSE + ".arff");
 
-	public static void escreveArquivo (List<String> fluxo) throws IOException {
+    public static void escreveArquivo(List<String> fluxo) throws IOException {
 
-		//Se o arquivo não existe, cria.
-		if (!Files.exists(file, LinkOption.NOFOLLOW_LINKS)) {
-			Files.createFile(file);
-		}
-		Files.write(file, fluxo, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
-	}
-	public static void extraindo(JpcapCaptor pcaptor) throws IOException {    	
+        //Se o arquivo nao existe, cria.
+        if (!Files.exists(file, LinkOption.NOFOLLOW_LINKS)) {
+            Files.createFile(file);
+        }
+        Files.write(file, fluxo, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
+    }
 
-		int janela = 0;
-		int payload = 0;  
-		int comp_cabecalhotcp = 0;
-		int comp_pacote = 0;
+    public static void extraindo(JpcapCaptor pcaptor) throws IOException {
 
-		List<String> fluxos = new ArrayList<>();
+        SummaryStatistics tamtotal_pacote = new SummaryStatistics();
+        SummaryStatistics comp_cabecalhoip = new SummaryStatistics();
+        SummaryStatistics comp_cabecalho_protocolo = new SummaryStatistics();
+        
+        Frequency codigo_protocolo = new Frequency();
 
-		//lista para receber os pacotes
-		final List<Packet> pacotes = new ArrayList<>();
-		pcaptor.loopPacket(-1, new PacketReceiver() {
-			@Override
-			public void receivePacket(Packet packet) {
-				if (packet instanceof IPPacket) {
-					pacotes.add(packet);
-				}
-			}
-		});
+        Frequency numero_srcport = new Frequency();
+        Frequency numero_dstport = new Frequency();
 
-		//percorrendo a lista de pacotes para calcular os atributos
-		int contador = 0;
-		for (Packet packet : pacotes) {
+        //lista para receber os pacotes
+        final List<Packet> pacotes = new ArrayList<>();
+        pcaptor.loopPacket(-1, new PacketReceiver() {
+            @Override
+            public void receivePacket(Packet packet) {
+                if (packet instanceof IPPacket) {
+                    pacotes.add(packet);
+                }
+            }
+        });
 
-			/*	if (packet instanceof TCPPacket) {
-				TCPPacket tcp = (TCPPacket) packet;
-				System.out.println(tcp);
+        //percorrendo a lista de pacotes para calcular os atributos
+        for (Packet packet : pacotes) {
+            //IPPacket, aqui ficam os atributos que sao comum ao TCP e UDP
+            if (packet instanceof IPPacket) {
+                IPPacket pacote = (IPPacket) packet;
 
-				//Pra que serve o número de bytes???
-				// número de bytes
-				quant_bytes = quant_bytes + tcp.caplen;
+                tamtotal_pacote.addValue(pacote.len); // tamanho total ou comprimento do pacote, cabeçalho + dados, pode ter tamanho mínimo é de vinte bytes e o máximo é 64 Kb                                
 
-				if (contador==0){ //pega o menor valor na primeira interaÃƒÂ§ÃƒÂ£o 
-					menor_bytes = quant_bytes;
-				}
-				if (quant_bytes < menor_bytes){
-					menor_bytes = quant_bytes; // retorna o menor valor de bytes
-				}
-				if(quant_bytes > maior_bytes){
-					maior_bytes = quant_bytes; //retorna o maior valor
-				} 
+                codigo_protocolo.addValue(((IPPacket) pacote).protocol); // Indica o protocolo (presente no campo de dados) que pediu o envio do datagrama, através de um código numérico, exemplos: - 01 ICMP  - 06 TCP - 17 UDP
+                
+                comp_cabecalhoip.addValue(pacote.header.length); //comprimento do cabecalho (sem dados), na teoria, pode ter no maximo 60 bytes
+                
+                comp_cabecalho_protocolo.addValue(pacote.length-20);
+            }
+            if (packet instanceof TCPPacket) {
+                TCPPacket pacote_tcp = (TCPPacket) packet;
+                
+               // tam_cabecalho.addValue(((TCPPacket)pacote_tcp).header.length); 
+                numero_srcport.addValue(((TCPPacket) pacote_tcp).src_port);
+                numero_dstport.addValue(((TCPPacket) pacote_tcp).dst_port);
+            }                                                              //Get Porta de Origem e destino  
+            if (packet instanceof UDPPacket) {
+                UDPPacket pacote_udp = (UDPPacket) packet;
+                
+               // tam_cabecalho.addValue(((UDPPacket)pacote_udp).header.length); //comprimento do cabecalho, na teoria, pode ter no maximo 60 bytes
+                numero_srcport.addValue(((UDPPacket) pacote_udp).src_port);
+                numero_dstport.addValue(((UDPPacket) pacote_udp).dst_port);
+            }
 
-				//obtÃƒÂ©m o Tamanho da janela
-				janela = janela + tcp.window;
+        }        
 
-				//obtÃƒÂ©m o tamanho do payload
-				payload = payload + tcp.data.length;
+        System.out.println("Dados do tamanho do pacote");
+        //Pacote completo - media, desvio padrao, variancia, valor maximo;
+        double tamtotal_medio_pacote = tamtotal_pacote.getMean();
+        double desvio_padrao_pacote = tamtotal_pacote.getStandardDeviation();
+        double variancia_pacote = tamtotal_pacote.getVariance();
+        double maximo_pacote = tamtotal_pacote.getMax();
+        double min_pacote = tamtotal_pacote.getMin();     
+        
+        BigDecimal ttmp = new BigDecimal(tamtotal_medio_pacote).setScale(5, RoundingMode.HALF_EVEN);
+        BigDecimal dpp = new BigDecimal(desvio_padrao_pacote).setScale(5, RoundingMode.HALF_EVEN);
+        BigDecimal vp = new BigDecimal(variancia_pacote).setScale(5, RoundingMode.HALF_EVEN);
+        
+        System.out.println("tamtotal_med_pacote:     " + (ttmp.doubleValue()));
+        System.out.println("desv_padrao_tamtotal:    " + (dpp.doubleValue()));
+        System.out.println("variancia_tamtotal:      " + (vp.doubleValue()));
+        System.out.println("tamtotal. pacote_maior:  " + maximo_pacote);
+        System.out.println("tamtotal. pacote_menor:  " + min_pacote);
+                     
+        System.out.println();
+        
+        System.out.println("Dados do tamanho do cabecalho");
+        //Cabecalho - media, desvio padrao e variancia;
+        double comp_medio_cabecalhoip = comp_cabecalhoip.getMean();
+        double desvio_padrao_cabecalhoip = comp_cabecalhoip.getStandardDeviation();
+        double variancia_cabecalhoip = comp_cabecalhoip.getVariance();
+        
+        BigDecimal cmcip = new BigDecimal(comp_medio_cabecalhoip).setScale(5, RoundingMode.HALF_EVEN);
+        BigDecimal dpcip = new BigDecimal(desvio_padrao_cabecalhoip).setScale(5, RoundingMode.HALF_EVEN);
+        BigDecimal vcip = new BigDecimal(variancia_cabecalhoip).setScale(5, RoundingMode.HALF_EVEN);
+        
+        System.out.println("Comp. med cabecalhoIP:   " + (cmcip.doubleValue()));
+        System.out.println("desv_padrao_cabecalhoIP: " + (dpcip.doubleValue()));
+        System.out.println("variancia_cabecalhoIP:   " + (vcip.doubleValue()));
+        
+        //Numero do protocolo - moda (que mais se repete entre os pacotes do .pcap)
+        List<Comparable<?>> moda_protocolo = codigo_protocolo.getMode();
 
-				//obtÃƒÂ©m o comprimento do cabeÃƒÂ§alho TCP 
-				comp_cabecalho = comp_cabecalho + tcp.header.length;
+        //Pega a porta que mais se repete entre os pacotes do .pcap
+        List<Comparable<?>> moda_srcporta = numero_srcport.getMode();
+        List<Comparable<?>> moda_dstporta = numero_dstport.getMode();
 
-				//obtÃƒÂ©m o nÃƒÂºmero de seqÃƒÂ¼ÃƒÂªncia de pacotes.
-				num_sequencia = num_sequencia + tcp.sequence;                                                                                               
+        System.out.println();       
+        System.out.println("Protocolo frequente: "+moda_protocolo.get(0));
+        System.out.println("Porta src: "+moda_srcporta.get(0));
+        System.out.println("Porta dst: "+moda_dstporta.get(0));
 
-				//obtÃƒÂ©m o nÃƒÂºmero dados recebidos 
-				num_ack = num_ack + tcp.ack_num;
+        System.out.println("---------------------------------------------------------");
 
-				//Não adianta somar o número das portas
+        List<String> fluxos = new ArrayList<>();
 
-				//obtÃƒÂ©m a porta origem
-				//porta_origem = porta_origem + tcp.src_port;
+        fluxos.add(
+                ttmp + "," + dpp + "," + vp + "," + maximo_pacote + "," + min_pacote + ","
+                + cmcip + "," + dpcip + "," + vcip + ","
+                + moda_protocolo.get(0) + ","
+                + moda_srcporta.get(0) + "," + moda_dstporta.get(0) + ","
+                + CLASSE
+        );
+        escreveArquivo(fluxos);
 
-				//obtÃƒÂ©m a porta destino
-				//porta_dest = porta_dest + tcp.dst_port;
-
-				contador++;
-		}*/
-			if (packet instanceof TCPPacket) {
-				TCPPacket tcp = (TCPPacket) packet;
-
-				//obtem o Tamanho da janela
-				janela = janela + tcp.window;
-
-				//obtem o tamanho do payload
-				payload = payload + tcp.data.length;
-
-				//obtem o comprimento do cabe�alho TCP 
-				comp_cabecalhotcp = comp_cabecalhotcp + tcp.header.length;
-
-				//obtem o comprimento do pacote IP
-				comp_pacote = comp_pacote + tcp.length;
-
-
-				contador++;
-			}
-
-
-		}
-
-		/*long media_janela = janela / contador; // media tamanho da janela
-
-		int media_payload = payload / contador; //media payload
-
-		int media_comprimento = comp_cabecalho / contador; //media comprimento do cabeÃƒÂ§alho TCP
-
-		long media_num_sequencia = num_sequencia / contador; //media do nÃƒÂºmero de seqÃƒÂ¼ÃƒÂªncia de pacotes.
-
-		long media_num_ack = num_ack / contador; //media do nÃƒÂºmero de dados recebidos 
-		 */
-
-		fluxos.add(+janela+ "," +payload+ "," +comp_cabecalhotcp+ "," +comp_pacote+ ",p2p");
-		escreveArquivo(fluxos);
-	}
+    }
 }
